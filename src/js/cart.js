@@ -1,4 +1,4 @@
-import { getLocalStorage } from "./utils.mjs";
+import { getLocalStorage, initCartIcon, qs } from "./utils.mjs";
 
 function renderCartContents() {
   const cartItems = getLocalStorage("so-cart");
@@ -6,7 +6,8 @@ function renderCartContents() {
   document.querySelector(".product-list").innerHTML = htmlItems.join("");
 }
 
-function cartItemTemplate(item) {
+function cartItemTemplate(item) {// Fix image path by converting relative path to absolute path
+  //const imagePath = item.Image.replace("../", "/");
   const newItem = `<li class="cart-card divider">
   <a href="#" class="cart-card__image">
     <img
@@ -18,11 +19,15 @@ function cartItemTemplate(item) {
     <h2 class="card__name">${item.Name}</h2>
   </a>
   <p class="cart-card__color">${item.Colors[0].ColorName}</p>
-  <p class="cart-card__quantity">qty: 1</p>
+  <p class="cart-card__quantity">qty: ${item.Quantity || 1}</p>
   <p class="cart-card__price">$${item.FinalPrice}</p>
 </li>`;
 
   return newItem;
 }
 
-renderCartContents();
+// Render cart contents and initialize cart icon when DOM is loaded
+document.addEventListener("DOMContentLoaded", () => {
+  renderCartContents();
+  initCartIcon();
+});
