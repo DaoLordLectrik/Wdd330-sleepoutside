@@ -6,7 +6,7 @@ function renderCartContents() {
   document.querySelector(".product-list").innerHTML = htmlItems.join("");
 }
 
-function cartItemTemplate(item) {// Fix image path by converting relative path to absolute path
+function cartItemTemplate(item) {// Convert relative path to absolute path to fix image path
   //const imagePath = item.Image.replace("../", "/");
   const newItem = `<li class="cart-card divider">
   <a href="#" class="cart-card__image">
@@ -26,7 +26,7 @@ function cartItemTemplate(item) {// Fix image path by converting relative path t
   return newItem;
 }
 
-// Render cart contents and initialize cart icon when DOM is loaded
+// initialize cart icon and render content when DOM is loaded
 document.addEventListener("DOMContentLoaded", () => {
   renderCartContents();
   initCartIcon();

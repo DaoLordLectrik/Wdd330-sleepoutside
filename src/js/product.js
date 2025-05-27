@@ -6,13 +6,13 @@ const dataSource = new ProductData("tents");
 function addProductToCart(product) {
   setLocalStorage("so-cart", product);
 }
-// add to cart button event handler
+// cart button event handler added
 async function addToCartHandler(e) {
   const product = await dataSource.findProductById(e.target.dataset.id);
   addProductToCart(product);
 }
 
-// add listener to Add to Cart button
+// listener to Add to Cart button added
 document
   .getElementById("addToCart")
   .addEventListener("click", addToCartHandler);

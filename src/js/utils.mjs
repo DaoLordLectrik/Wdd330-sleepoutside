@@ -1,9 +1,6 @@
-// wrapper for querySelector...returns matching element
 export function qs(selector, parent = document) {
   return parent.querySelector(selector);
 }
-// or a more concise version if you are into that sort of thing:
-// export const qs = (selector, parent = document) => parent.querySelector(selector);
 
 // retrieve data from localstorage
 export function getLocalStorage(key) {
@@ -20,7 +17,7 @@ export function setLocalStorage(key, data) {
     (cartItem) => cartItem.Id === data.Id
   );
   
-  // If item exists, increase quantity
+  // Increase quantity if element exist
   if (existingItemIndex !== -1) {
     cartItems[existingItemIndex].Quantity = 
       (cartItems[existingItemIndex].Quantity || 1) + 1;
@@ -29,14 +26,14 @@ export function setLocalStorage(key, data) {
     cartItems.push({...data, Quantity: 1});
   }
   
-  // Save updated cart back to local storage
+  // Save updated cart to local storage
   localStorage.setItem(key, JSON.stringify(cartItems));
   
   // Update cart icon
   updateCartIcon();
 }
 
-// set a listener for both touchend and click
+// listener for both touchend and click
 export function setClick(selector, callback) {
   const element = qs(selector);
   element.addEventListener("touchend", (event) => {
@@ -64,7 +61,7 @@ export function updateCartIcon() {
     cartLink.appendChild(cartCount);
   }
   
-  // Only show count if there are items
+  // show only count if there are items
   cartCount.textContent = totalQuantity > 0 ? totalQuantity : '';
   cartCount.style.display = totalQuantity > 0 ? 'inline-block' : 'none';
 }
