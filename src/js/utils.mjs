@@ -1,72 +1,85 @@
+// wrapper for querySelector...returns matching element
 export function qs(selector, parent = document) {
   return parent.querySelector(selector);
 }
+// or a more concise version if you are into that sort of thing:
+// export const qs = (selector, parent = document) => parent.querySelector(selector);
 
 // retrieve data from localstorage
 export function getLocalStorage(key) {
-  return JSON.parse(localStorage.getItem(key)) || [];
+  return JSON.parse(localStorage.getItem(key));
 }
-
-// save data to local storage with cart management
+// save data to local storage
 export function setLocalStorage(key, data) {
-  // Get existing cart items
-  const cartItems = getLocalStorage(key) || [];
-  
-  // Check if item already exists in cart
-  const existingItemIndex = cartItems.findIndex(
-    (cartItem) => cartItem.Id === data.Id
-  );
-  
-  // Increase quantity if element exist
-  if (existingItemIndex !== -1) {
-    cartItems[existingItemIndex].Quantity = 
-      (cartItems[existingItemIndex].Quantity || 1) + 1;
-  } else {
-    // Add new item with quantity
-    cartItems.push({...data, Quantity: 1});
-  }
-  
-  // Save updated cart to local storage
-  localStorage.setItem(key, JSON.stringify(cartItems));
-  
-  // Update cart icon
-  updateCartIcon();
+  localStorage.setItem(key, JSON.stringify(data));
 }
-
-// listener for both touchend and click
+// set a listener for both touchend and click
 export function setClick(selector, callback) {
-  const element = qs(selector);
-  element.addEventListener("touchend", (event) => {
+  qs(selector).addEventListener("touchend", (event) => {
     event.preventDefault();
     callback();
   });
-  element.addEventListener("click", callback);
+  qs(selector).addEventListener("click", callback);
 }
 
-// Update cart icon with number of items
-export function updateCartIcon() {
+// Function to get parameters from the URL
+export function getParam(param) {
+  const queryString = window.location.search;
+  const urlParams = new URLSearchParams(queryString);
+  return urlParams.get(param);
+}
+
+// Format currency
+export function formatCurrency(amount) {
+  return `$${amount.toFixed(2)}`;
+}
+
+// Get the number of items in the cart
+export function getCartItemCount() {
   const cartItems = getLocalStorage("so-cart");
-  const totalQuantity = cartItems.reduce(
-    (total, item) => total + (item.Quantity || 1), 
-    0
-  );
-  
-  // Find or create cart count element
-  let cartLink = qs(".cart a");
-  let cartCount = qs(".cart-count", cartLink);
-  
-  if (!cartCount) {
-    cartCount = document.createElement("span");
-    cartCount.classList.add("cart-count");
-    cartLink.appendChild(cartCount);
-  }
-  
-  // show only count if there are items
-  cartCount.textContent = totalQuantity > 0 ? totalQuantity : '';
-  cartCount.style.display = totalQuantity > 0 ? 'inline-block' : 'none';
+  return cartItems ? cartItems.length : 0;
 }
 
-// Initialize cart icon on page load
-export function initCartIcon() {
-  updateCartIcon();
+// Update the cart count display
+export function updateCartCount() {
+  const cartCountElement = document.getElementById("cart-count");
+  if (cartCountElement) {
+    const count = getCartItemCount();
+    if (count > 0) {
+      cartCountElement.textContent = count;
+      cartCountElement.style.display = "block";
+    } else {
+      cartCountElement.style.display = "none";
+    }
+  }
+}
+
+// render template with data if available
+export function renderWithTemplate(template, parentElement, data, callback) {
+  parentElement.innerHTML = template;
+  if(callback) {
+    callback(data);
+  }
+}
+
+// load template from file
+export async function loadTemplate(path) {
+  const res = await fetch(path);
+  const template = await res.text();
+  return template;
+}
+
+// load and render header and footer
+export async function loadHeaderFooter() {
+  const headerTemplate = await loadTemplate("/partials/header.html");
+  const footerTemplate = await loadTemplate("/partials/footer.html");
+
+  const headerElement = document.querySelector("#main-header");
+  const footerElement = document.querySelector("#main-footer");
+
+  renderWithTemplate(headerTemplate, headerElement);
+  renderWithTemplate(footerTemplate, footerElement);
+  
+  // Update cart count after header is loaded
+  updateCartCount();
 }
